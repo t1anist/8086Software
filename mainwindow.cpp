@@ -9,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent)
     this->welDialog = new WelcomeDialog(this);
     this->show();
     welDialog->show();
+    connect(welDialog,&WelcomeDialog::newPage,this,&MainWindow::openNewPage);
+    connect(welDialog,&WelcomeDialog::openFile,this,&MainWindow::openFile);
 }
 
 MainWindow::~MainWindow()

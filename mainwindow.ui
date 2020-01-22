@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>8086Simulator</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="Images.qrc">
+    <normaloff>:/icons/images/icons/CPU.ico</normaloff>:/icons/images/icons/CPU.ico</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -37,6 +41,8 @@
    </attribute>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="Images.qrc"/>
+ </resources>
  <connections/>
 </ui>

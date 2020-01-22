@@ -18,14 +18,17 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
+    newdialog.cpp \
     welcomedialog.cpp
 
 HEADERS += \
     mainwindow.h \
+    newdialog.h \
     welcomedialog.h
 
 FORMS += \
     mainwindow.ui \
+    newdialog.ui \
     welcomedialog.ui
 
 # Default rules for deployment.
