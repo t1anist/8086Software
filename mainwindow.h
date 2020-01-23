@@ -6,7 +6,13 @@
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QString>
+#include <QLabel>
 #include <QDebug>
+
+#include "Qsci/qsciscintilla.h"
+#include "Qsci/qscilexercss.h"
+#include "Qsci/qsciapis.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -24,6 +30,9 @@ private:
     Ui::MainWindow *ui;
     WelcomeDialog *welDialog;
     NewDialog *newPage;
+    QsciScintilla *editor;
+    QLabel *col;
+    QLabel *line;
 
 
 private slots:
