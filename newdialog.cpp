@@ -15,12 +15,18 @@ NewDialog::NewDialog(QWidget *parent) :
     buttonGroup->setId(ui->exe,1);
     buttonGroup->setId(ui->empty,2);
     buttonGroup->setId(ui->emulator,3);
-    //connect(buttonGroup,SIGNAL(QButtonGroup::buttonClicked(int)),this,SLOT(NewDialog::checkedButton(int)));
+    connect(ui->buttonBox,&QDialogButtonBox::accepted,this,&NewDialog::ok);
+}
 
+void NewDialog::ok(){
+    int id = buttonGroup->checkedId();
+    emit sendType(id);
+    this->close();
 }
 
 NewDialog::~NewDialog()
 {
     delete ui;
 }
+
 

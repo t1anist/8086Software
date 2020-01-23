@@ -23,16 +23,9 @@ private:
 
 private slots:
     //Button slots
-    void newPressed(){
-        emit newPage();
-    }
-    void helpPressed(){
-        emit helpPage();
-    }
-    void openFileDialog(){
-        this->hide();
-        emit openFile();
-    }
+    void newPressed();
+    void helpPressed();
+    void openFileDialog();
 
 signals:
     //signals to mainwindow

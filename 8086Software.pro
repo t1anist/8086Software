@@ -38,3 +38,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     Images.qrc
+
+LIBS += \
+     -L$$PWD/libs -lqscintilla2_qt5d
+   # -LD:\Tian\Downloads\QScintilla-2.11.4\build-qscintilla-Desktop_Qt_5_12_6_MinGW_64_bit-Debug\debug -lqscintilla2_qt5d

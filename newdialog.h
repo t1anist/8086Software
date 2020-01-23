@@ -21,13 +21,12 @@ private:
     Ui::NewDialog *ui;
     QButtonGroup *buttonGroup;
 
-signals:
-    void templateType(int id);
-
 private slots:
-    void checkedButton(int id){
-        emit templateType(id);
-    }
+    void ok();
+
+signals:
+    void sendType(int id);
+
 };
 
 #endif // NEWDIALOG_H

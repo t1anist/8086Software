@@ -38,4 +38,16 @@ WelcomeDialog::~WelcomeDialog()
     delete ui;
 }
 
+//Button slots
+void WelcomeDialog::newPressed(){
+    emit newPage();
+}
+void WelcomeDialog::helpPressed(){
+    emit helpPage();
+}
+void WelcomeDialog::openFileDialog(){
+    this->close();
+    emit openFile();
+}
+
 

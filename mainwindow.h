@@ -6,7 +6,14 @@
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QString>
+#include <QLabel>
 #include <QDebug>
+#include <QMessageBox>
+
+#include "Qsci/qsciscintilla.h"
+#include "Qsci/qscilexercpp.h"
+#include "Qsci/qsciapis.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -24,24 +31,34 @@ private:
     Ui::MainWindow *ui;
     WelcomeDialog *welDialog;
     NewDialog *newPage;
+    QsciScintilla *editor;
+    QString curFile;
+    QLabel *col;
+    QLabel *line;
+    bool isFixedFile = false;
+    void setQscintilla();
+    void connectAction();
+    bool maybeSave();
+    void loadFile(const QString &fileName);
+    bool saveFile(const QString &fileName);
+    void setCurrentFile(const QString &fileName);
+    QString strippedName(const QString &fullFileName);
+    void openTemplateType(int type);
 
 
 private slots:
-    void openNewPage(){
-        welDialog->hide();
-        delete welDialog;
-        newPage = new NewDialog(this);
-        newPage->show();
-    }
-    void openFile(){
-        QString path = QFileDialog::getOpenFileName(this,"Open File","../8086Software/examples",
-                                                    "All known files(*.asm *.exe *.com);;"
-                                                    "Assembly source files(*.asm);;"
-                                                    "Binary execute files(*.com);;"
-                                                    "Execute files(*.exe);;"
-                                                    "All files(*.*)");
-        qDebug() << path;
-    }
+    void openNewPage();
+    void openTemplate(int);
+    void newFile();
+    void open();
+    bool save();
+    bool saveAs();
+    void documentWasModified();
+    void openComTemplate();
+    void openExeTemplate();
+    void openExamples();
+    void cursorChange(int lin, int index);
+
 
 };
 #endif // MAINWINDOW_H
