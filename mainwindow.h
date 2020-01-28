@@ -15,6 +15,11 @@
 #include "Qsci/qsciapis.h"
 
 
+#include "Qsci/qsciscintilla.h"
+#include "Qsci/qscilexercss.h"
+#include "Qsci/qsciapis.h"
+
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -44,6 +49,7 @@ private:
     void setCurrentFile(const QString &fileName);
     QString strippedName(const QString &fullFileName);
     void openTemplateType(int type);
+
 
 
 private slots:
