@@ -16,7 +16,7 @@
 
 
 #include "Qsci/qsciscintilla.h"
-#include "Qsci/qscilexercss.h"
+#include "Qsci/qscilexercpp.h"
 #include "Qsci/qsciapis.h"
 
 

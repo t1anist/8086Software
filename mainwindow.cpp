@@ -16,12 +16,12 @@ MainWindow::MainWindow(QWidget *parent)
     setQscintilla();
     editor=new QsciScintilla(this);
     //设置语法
-    QsciLexerCSS *textLexer=new QsciLexerCSS;//创建一个词法分析器
+    QsciLexerCPP *textLexer=new QsciLexerCPP;//创建一个词法分析器
     editor->setLexer(textLexer); //给QsciScintilla设置词法分析器
     textLexer->setPaper(QColor(Qt::white));//文本区域背景色
-    textLexer->setColor(QColor(0,170,0),QsciLexerCSS::Comment); //设置自带的注释行为灰色
-    textLexer->setColor(QColor(Qt::yellow),QsciLexerCSS::Tag);//标签
-    textLexer->setColor(QColor(Qt::yellow),QsciLexerCSS::IDSelector);//id选择器
+    textLexer->setColor(QColor(0,170,0),QsciLexerCPP::Comment); //设置自带的注释行为灰色
+//    textLexer->setColor(QColor(Qt::yellow),QsciLexerCSS::Tag);//标签
+//    textLexer->setColor(QColor(Qt::yellow),QsciLexerCSS::IDSelector);//id选择器
     //代码提示
     QsciAPIs *apis=new QsciAPIs(textLexer);
     apis->add(QString("gongjianbo1"));
@@ -33,17 +33,17 @@ MainWindow::MainWindow(QWidget *parent)
     line_font.setFamily("SimSun");
     line_font.setPointSize(11);
     editor->setFont(line_font);//设置文本字体
-    editor->setWrapMode(QsciScintilla::WrapWord); //文本自动换行模式
+    //editor->setWrapMode(QsciScintilla::WrapWord); //文本自动换行模式
     //editor->setWrapVisualFlags(QsciScintilla::WrapFlagByText);
     editor->setEolMode(QsciScintilla::EolWindows); //微软风格换行符
     //editor->setEolVisibility(true);//显示换行符
-        editor->setWhitespaceVisibility(QsciScintilla::WsVisible);//此时空格为点，\t为箭头
-        editor->setWhitespaceSize(2);//空格点大小
+        editor->setWhitespaceVisibility(QsciScintilla::WsInvisible);//此时空格为点，\t为箭头
+        //editor->setWhitespaceSize(2);//空格点大小
 
         //indent
         editor->setIndentationsUseTabs(false);//false用表示用空格代替\t
         editor->setTabWidth(4);//\t宽度设为四个空格
-        editor->setIndentationGuides(true);//用tab键缩进时，在缩进位置上显示一个竖点线，缩进有效，在字符串后加空格不显示
+       // editor->setIndentationGuides(true);//用tab键缩进时，在缩进位置上显示一个竖点线，缩进有效，在字符串后加空格不显示
         editor->setIndentationWidth(0);//如果在行首部空格位置tab，缩进的宽度字符数，并且不会转换为空格
         editor->setAutoIndent(true);//换行后自动缩进
         editor->setBackspaceUnindents(true);
@@ -53,7 +53,7 @@ MainWindow::MainWindow(QWidget *parent)
         //current line color
         editor->setCaretWidth(2);//光标宽度，0表示不显示光标
         editor->setCaretForegroundColor(QColor("darkCyan"));  //光标颜色
-        editor->setCaretLineVisible(true); //是否高亮显示光标所在行
+        editor->setCaretLineVisible(false); //是否高亮显示光标所在行
         editor->setCaretLineBackgroundColor(QColor(100,250,100));//光标所在行背景颜色
 
         //selection color
