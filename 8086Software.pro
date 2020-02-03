@@ -19,11 +19,13 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     newdialog.cpp \
+    recentfileaction.cpp \
     welcomedialog.cpp
 
 HEADERS += \
     mainwindow.h \
     newdialog.h \
+    recentfileaction.h \
     welcomedialog.h
 
 FORMS += \

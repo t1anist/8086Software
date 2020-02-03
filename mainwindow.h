@@ -3,26 +3,27 @@
 
 #include "welcomedialog.h"
 #include "newdialog.h"
+#include "recentfileaction.h"
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QString>
 #include <QLabel>
 #include <QDebug>
 #include <QMessageBox>
+#include <QSettings>
+#include <QQueue>
 
 #include "Qsci/qsciscintilla.h"
 #include "Qsci/qscilexercpp.h"
 #include "Qsci/qsciapis.h"
 
 
-#include "Qsci/qsciscintilla.h"
-#include "Qsci/qscilexercpp.h"
-#include "Qsci/qsciapis.h"
 
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
+
 
 class MainWindow : public QMainWindow
 {
@@ -33,6 +34,7 @@ public:
     ~MainWindow();
 
 private:
+    //Widgets
     Ui::MainWindow *ui;
     WelcomeDialog *welDialog;
     NewDialog *newPage;
@@ -40,6 +42,11 @@ private:
     QString curFile;
     QLabel *col;
     QLabel *line;
+    QSettings *recent;
+    QQueue<QString> listOpenHistory;
+
+    void loadRecent();
+    //save setting
     bool isFixedFile = false;
     void setQscintilla();
     void connectAction();
@@ -49,6 +56,8 @@ private:
     void setCurrentFile(const QString &fileName);
     QString strippedName(const QString &fullFileName);
     void openTemplateType(int type);
+    void openEmulator();
+    void updateRecent();
 
 
 
@@ -57,6 +66,7 @@ private slots:
     void openTemplate(int);
     void newFile();
     void open();
+    void open(QString);
     bool save();
     bool saveAs();
     void documentWasModified();
@@ -64,6 +74,8 @@ private slots:
     void openExeTemplate();
     void openExamples();
     void cursorChange(int lin, int index);
+    void help();
+    void clearRecent();
 
 
 };

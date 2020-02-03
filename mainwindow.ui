@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -46,6 +49,15 @@
      </property>
      <addaction name="actionmore_examples"/>
     </widget>
+    <widget class="QMenu" name="menurecent_files">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="title">
+      <string>recent files</string>
+     </property>
+     <addaction name="separator"/>
+    </widget>
     <addaction name="menunew"/>
     <addaction name="separator"/>
     <addaction name="menuexamples"/>
@@ -55,7 +67,7 @@
     <addaction name="actionsave"/>
     <addaction name="actionsave_as"/>
     <addaction name="separator"/>
-    <addaction name="actionpath"/>
+    <addaction name="menurecent_files"/>
     <addaction name="separator"/>
     <addaction name="actionexit"/>
    </widget>
@@ -213,11 +225,6 @@
     <string>save as ....</string>
    </property>
   </action>
-  <action name="actionpath">
-   <property name="text">
-    <string>path</string>
-   </property>
-  </action>
   <action name="actionexit">
    <property name="text">
     <string>exit</string>
@@ -354,6 +361,9 @@
    </property>
   </action>
   <action name="actiondisplay_whitespace">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>display whitespace</string>
    </property>

@@ -6,6 +6,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    //load recent files
+    loadRecent();
     //load component
     col = new QLabel(this);
     line = new QLabel(this);
@@ -23,7 +25,55 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    QString strPath = "../8086Software/recent.ini";
+    recent = new QSettings(strPath, QSettings::IniFormat);
+    recent->beginWriteArray("OpenHistorys");
+    for (int i = 0; i != listOpenHistory.size(); ++i){
+        recent->setArrayIndex(i);
+        recent->setValue("path",listOpenHistory[i]);
+    }
+    recent->endArray();
+    delete recent;
     delete ui;
+}
+
+void MainWindow::loadRecent(){
+    QString strPath = "../8086Software/recent.ini";
+    recent = new QSettings(strPath, QSettings::IniFormat);
+    int nSize = recent->beginReadArray("OpenHistorys");
+    for (int i = 0; i != nSize; ++i){
+        recent->setArrayIndex(i);
+        QString recentfile;
+        recentfile = recent->value("path").toString();
+        QFile file(recentfile);
+        if (!file.exists())
+            continue;
+        listOpenHistory.enqueue(recentfile);
+    }
+    recent->endArray();
+    updateRecent();
+}
+
+void MainWindow::updateRecent(){
+    ui->menurecent_files->clear();
+    if (listOpenHistory.size()==0){
+            ui->menurecent_files->setEnabled(false);
+            return;
+    }else{
+        ui->menurecent_files->setEnabled(true);
+        for (int i = 0; i != listOpenHistory.size(); ++i){
+            RecentFileAction *recentAct = (RecentFileAction*)ui->menurecent_files->addAction(listOpenHistory[i]);
+
+            connect(recentAct,&RecentFileAction::triggered,recentAct,&RecentFileAction::openRecent);
+            void (RecentFileAction::*funcS1)(QString) = &RecentFileAction::openFile;
+            void (MainWindow::*funcR1)(QString) = &MainWindow::open;
+            connect(recentAct,funcS1,this,funcR1);
+        }
+        ui->menurecent_files->addSeparator();
+        QAction *clear = ui->menurecent_files->addAction("clear list");
+        connect(clear,&QAction::triggered,this,&MainWindow::clearRecent);
+        ui->menurecent_files->update();
+    }
 }
 
 void MainWindow::setQscintilla(){
@@ -109,6 +159,7 @@ void MainWindow::setQscintilla(){
 void MainWindow::connectAction(){
     //WelcomeDialog connect
     connect(welDialog,&WelcomeDialog::newPage,this,&MainWindow::openNewPage);
+    connect(welDialog,&WelcomeDialog::helpPage,this,&MainWindow::help);
     //connect(welDialog,&WelcomeDialog::openFile,this,&MainWindow::openFile);
     //connect(editor,&QsciScintilla::cursorPositionChanged,this,&MainWindow::cursorChange);
     //connect(editor, &QsciScintilla::textChanged,this, &MainWindow::documentWasModified);
@@ -117,7 +168,7 @@ void MainWindow::connectAction(){
     connect(ui->actioncom_template,&QAction::triggered,this,&MainWindow::openComTemplate);
     connect(ui->actionexe_template,&QAction::triggered,this,&MainWindow::openExeTemplate);
     connect(ui->actionmore_examples,&QAction::triggered,this,&MainWindow::openExamples);
-    connect(ui->actionopen,&QAction::triggered,this,&MainWindow::open);
+    connect(ui->actionopen,SIGNAL(triggered()),this,SLOT(open()));
     connect(ui->actionsave,&QAction::triggered,this,&MainWindow::save);
     connect(ui->actionsave_as,&QAction::triggered,this,&MainWindow::saveAs);
     connect(ui->actionexit,&QAction::triggered,this,&MainWindow::close);
@@ -128,7 +179,11 @@ void MainWindow::connectAction(){
     connect(ui->actionsave,&QAction::triggered,this,&MainWindow::save);
     connect(ui->actionsave,&QAction::triggered,this,&MainWindow::save);
 
-
+    //Tool Connect
+    connect(ui->actionnew,&QAction::triggered,this,&MainWindow::openNewPage);
+    connect(ui->actionopen_2,SIGNAL(triggered()),this,SLOT(open()));
+    connect(ui->actionsave_2,&QAction::triggered,this,&MainWindow::save);
+    connect(ui->actionsave_as_2,&QAction::triggered,this,&MainWindow::saveAs);
 }
 
 void MainWindow::openTemplate(int type){
@@ -137,13 +192,19 @@ void MainWindow::openTemplate(int type){
             break;
         case 1: openExeTemplate();
             break;
+        case 2: newFile();
+            break;
+        case 3: openEmulator();
+            break;
         default: break;
     }
 }
 
 void MainWindow::openNewPage(){
-    welDialog->hide();
-    delete welDialog;
+    if(welDialog){
+        delete welDialog;
+        welDialog = NULL;
+    }
     newPage = new NewDialog(this);
     connect(newPage,SIGNAL(sendType(int)),this,SLOT(openTemplate(int)));
     newPage->exec();   
@@ -166,6 +227,11 @@ void MainWindow::openExeTemplate(){
     }
 }
 
+void MainWindow::openEmulator(){
+
+}
+
+
 void MainWindow::openExamples(){
     QString fileName = QFileDialog::getOpenFileName(this,"Open File","../8086Software/examples",
                                                     "All known files(*.asm *.exe *.com);;"
@@ -176,6 +242,12 @@ void MainWindow::openExamples(){
     if (!fileName.isEmpty())
         loadFile(fileName);
 }
+
+
+void MainWindow::help(){
+    qDebug()<< "help";
+}
+
 
 void MainWindow::cursorChange(int lin, int index){
     col->setText(QString("col:%1").arg(index));
@@ -204,11 +276,33 @@ void MainWindow::open()
     }
 }
 
+void MainWindow::open(QString fileName)
+{
+    if (maybeSave()) {
+        if (!fileName.isEmpty())
+            loadFile(fileName);
+    }
+}
+
 bool MainWindow::save()
 {
     if (curFile.isEmpty()||isFixedFile) {
         return saveAs();
     } else {
+        bool isRecent = false;
+        for (int i = 0 ; i != listOpenHistory.size();i++) {
+            if(curFile==listOpenHistory[i]){
+                isRecent = true;
+                break;
+            }
+        }
+        if(!isRecent){
+            if(listOpenHistory.size()>10){
+                listOpenHistory.dequeue();
+            }
+            listOpenHistory.enqueue(curFile);
+        }
+        updateRecent();
         return saveFile(curFile);
     }
 }
@@ -224,6 +318,11 @@ bool MainWindow::saveAs()
     if (fileName.isEmpty())
         return false;
     isFixedFile = false;
+    if(listOpenHistory.size()>10){
+        listOpenHistory.dequeue();
+    }
+    listOpenHistory.enqueue(fileName);
+    updateRecent();
     return saveFile(fileName);
 }
 void MainWindow::setCurrentFile(const QString &fileName)
@@ -245,12 +344,13 @@ void MainWindow::setCurrentFile(const QString &fileName)
 bool MainWindow::maybeSave()
 {
     if (editor->isModified()) {
-        int ret = QMessageBox::warning(this, tr("Application"),
-                     tr("The document has been modified.\n"
-                        "Do you want to save your changes?"),
+        int ret = QMessageBox::warning(this, "Application",
+                     "The document has been modified.\n"
+                        "Do you want to save your changes?",
                      QMessageBox::Yes | QMessageBox::Default,
                      QMessageBox::No,
                      QMessageBox::Cancel | QMessageBox::Escape);
+
         if (ret == QMessageBox::Yes)
             return save();
         else if (ret == QMessageBox::Cancel)
@@ -310,3 +410,18 @@ QString MainWindow::strippedName(const QString &fullFileName)
     return QFileInfo(fullFileName).fileName();
 }
 
+void MainWindow::clearRecent(){
+    for (int i = 0;i<listOpenHistory.size();i++) {
+        listOpenHistory.dequeue();
+    }
+    QString strPath = "../8086Software/recent.ini";
+    recent = new QSettings(strPath, QSettings::IniFormat);
+    recent->beginWriteArray("OpenHistorys");
+    for (int i = 0; i < 10; ++i){
+        recent->setArrayIndex(i);
+        recent->setValue("path","null");
+    }
+    recent->endArray();
+    delete recent;
+    updateRecent();
+}
