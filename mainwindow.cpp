@@ -160,7 +160,8 @@ void MainWindow::connectAction(){
     //WelcomeDialog connect
     connect(welDialog,&WelcomeDialog::newPage,this,&MainWindow::openNewPage);
     connect(welDialog,&WelcomeDialog::helpPage,this,&MainWindow::help);
-    //connect(welDialog,&WelcomeDialog::openFile,this,&MainWindow::openFile);
+    void (MainWindow::*func1)(QString) = &MainWindow::open;
+    connect(welDialog,&WelcomeDialog::openFile,this,func1);
     //connect(editor,&QsciScintilla::cursorPositionChanged,this,&MainWindow::cursorChange);
     //connect(editor, &QsciScintilla::textChanged,this, &MainWindow::documentWasModified);
     //Menu Connect
@@ -317,11 +318,19 @@ bool MainWindow::saveAs()
                                                     "All files(*.*)");
     if (fileName.isEmpty())
         return false;
-    isFixedFile = false;
-    if(listOpenHistory.size()>10){
-        listOpenHistory.dequeue();
+    bool isRecent = false;
+    for (int i = 0 ; i != listOpenHistory.size();i++) {
+        if(fileName==listOpenHistory[i]){
+            isRecent = true;
+            break;
+        }
     }
-    listOpenHistory.enqueue(fileName);
+    if(!isRecent){
+        if(listOpenHistory.size()>10){
+            listOpenHistory.dequeue();
+        }
+        listOpenHistory.enqueue(fileName);
+    }
     updateRecent();
     return saveFile(fileName);
 }
@@ -400,8 +409,7 @@ bool MainWindow::saveFile(const QString &fileName)
     return true;
 }
 
-void MainWindow::documentWasModified()
-{
+void MainWindow::documentWasModified(){
     setWindowModified(editor->isModified());
 }
 
@@ -411,7 +419,7 @@ QString MainWindow::strippedName(const QString &fullFileName)
 }
 
 void MainWindow::clearRecent(){
-    for (int i = 0;i<listOpenHistory.size();i++) {
+    for (int i = 0;i!=listOpenHistory.size();i++) {
         listOpenHistory.dequeue();
     }
     QString strPath = "../8086Software/recent.ini";
@@ -422,6 +430,5 @@ void MainWindow::clearRecent(){
         recent->setValue("path","null");
     }
     recent->endArray();
-    delete recent;
     updateRecent();
 }

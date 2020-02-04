@@ -3,6 +3,10 @@
 
 #include <newdialog.h>
 #include <QDialog>
+#include <QSettings>
+#include <QFile>
+
+#include "recentfileaction.h"
 
 
 namespace Ui {
@@ -20,18 +24,19 @@ public:
 private:
     Ui::WelcomeDialog *ui;
     NewDialog *newDialog;
+    QStringList listOpenHistory;
 
 private slots:
     //Button slots
     void newPressed();
     void helpPressed();
-    void openFileDialog();
+    void openRecent(QString);
 
 signals:
     //signals to mainwindow
     void newPage();
     void helpPage();
-    void openFile();
+    void openFile(QString);
 
 };
 

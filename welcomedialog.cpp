@@ -26,10 +26,25 @@ WelcomeDialog::WelcomeDialog(QWidget *parent) :
     connect(ui->helpButton,&QToolButton::pressed,this,&WelcomeDialog::helpPressed);
     //Recent Button
     QMenu *recentMenu = new QMenu;
-    QAction *openFile= recentMenu->addAction("other files");
+    QString strPath = "../8086Software/recent.ini";
+    QSettings *recent = new QSettings(strPath, QSettings::IniFormat);
+    int nSize = recent->beginReadArray("OpenHistorys");
+    for (int i = 0; i != nSize; ++i){
+        recent->setArrayIndex(i);
+        QString recentfile;
+        recentfile = recent->value("path").toString();
+        QFile file(recentfile);
+        if (!file.exists())
+            continue;
+        RecentFileAction *recentAct = (RecentFileAction*)recentMenu->addAction(recentfile);
+        connect(recentAct,&RecentFileAction::triggered,recentAct,&RecentFileAction::openRecent);
+        void (RecentFileAction::*funcS1)(QString) = &RecentFileAction::openFile;
+        void (WelcomeDialog::*funcR1)(QString) = &WelcomeDialog::openRecent;
+        connect(recentAct,funcS1,this,funcR1);
+    }
+    recent->endArray();
     ui->recentButton->setMenu(recentMenu);
     ui->recentButton->setPopupMode(QToolButton::InstantPopup);
-    connect(openFile,&QAction::triggered,this,&WelcomeDialog::openFileDialog);
 
 }
 
@@ -40,14 +55,16 @@ WelcomeDialog::~WelcomeDialog()
 
 //Button slots
 void WelcomeDialog::newPressed(){
+    this->close();
     emit newPage();
 }
 void WelcomeDialog::helpPressed(){
+    this->close();
     emit helpPage();
 }
-void WelcomeDialog::openFileDialog(){
+void WelcomeDialog::openRecent(QString fileName){
     this->close();
-    emit openFile();
+    emit openFile(fileName);
 }
 
 
