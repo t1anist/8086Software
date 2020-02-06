@@ -419,7 +419,8 @@ QString MainWindow::strippedName(const QString &fullFileName)
 }
 
 void MainWindow::clearRecent(){
-    for (int i = 0;i!=listOpenHistory.size();i++) {
+    int size = listOpenHistory.size();
+    for (int i = 0;i<size;i++) {
         listOpenHistory.dequeue();
     }
     QString strPath = "../8086Software/recent.ini";
