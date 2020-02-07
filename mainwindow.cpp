@@ -175,8 +175,17 @@ void MainWindow::connectAction(){
     connect(ui->actionexit,&QAction::triggered,this,&MainWindow::close);
 
     //2.edit
-    //connect(ui->actionundo,&QAction::triggered,editor,&QsciScintilla::undo);
-   // connect(ui->actioncut,SIGNAL(triggered()),this,SLOT(cut()));
+    connect(ui->actionundo,&QAction::triggered,editor,&QsciScintilla::undo);
+    connect(ui->actionredo,&QAction::triggered,editor,&QsciScintilla::redo);
+    connect(ui->actioncut,&QAction::triggered,editor,&QsciScintilla::cut);
+    connect(ui->actioncopy,&QAction::triggered,editor,&QsciScintilla::copy);
+    connect(ui->actionpaste,&QAction::triggered,editor,&QsciScintilla::paste);
+    ui->actioncut->setEnabled(false);
+    ui->actioncopy->setEnabled(false);
+    connect(editor,&QsciScintilla::copyAvailable,ui->actioncut,&QAction::setEnabled);
+    connect(editor,&QsciScintilla::copyAvailable,ui->actioncopy,&QAction::setEnabled);
+
+
     connect(ui->actionsave,&QAction::triggered,this,&MainWindow::save);
     connect(ui->actionsave,&QAction::triggered,this,&MainWindow::save);
 
