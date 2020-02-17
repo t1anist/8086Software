@@ -9,9 +9,7 @@ WelcomeDialog::WelcomeDialog(QWidget *parent) :
     //load ui
     ui->setupUi(this);
     //cancel "what's this"
-    Qt::WindowFlags flags=Qt::Dialog;
-    flags |=Qt::WindowCloseButtonHint;
-    setWindowFlags(flags);
+    this->setWindowFlags(windowFlags()&~Qt::WindowContextHelpButtonHint);
     //New Button:
     connect(ui->newButton,&QToolButton::pressed,this,&WelcomeDialog::newPressed);
     //Example Button:

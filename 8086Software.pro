@@ -16,6 +16,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    gotolinedialog.cpp \
     main.cpp \
     mainwindow.cpp \
     newdialog.cpp \
@@ -23,12 +24,14 @@ SOURCES += \
     welcomedialog.cpp
 
 HEADERS += \
+    gotolinedialog.h \
     mainwindow.h \
     newdialog.h \
     recentfileaction.h \
     welcomedialog.h
 
 FORMS += \
+    gotolinedialog.ui \
     mainwindow.ui \
     newdialog.ui \
     welcomedialog.ui

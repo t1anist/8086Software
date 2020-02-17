@@ -17,10 +17,19 @@ MainWindow::MainWindow(QWidget *parent)
     ui->statusbar->addWidget(col);
     setQscintilla();
     setCentralWidget(editor);
+    setCurrentFile("");
     this->welDialog = new WelcomeDialog(this);
     this->connectAction();
     this->show();
     welDialog->show();
+}
+
+void MainWindow::closeEvent(QCloseEvent *event){
+    if (maybeSave()){
+        event->accept();
+    } else {
+        event->ignore();
+    }
 }
 
 MainWindow::~MainWindow()
@@ -62,7 +71,7 @@ void MainWindow::updateRecent(){
     }else{
         ui->menurecent_files->setEnabled(true);
         for (int i = 0; i != listOpenHistory.size(); ++i){
-            RecentFileAction *recentAct = (RecentFileAction*)ui->menurecent_files->addAction(listOpenHistory[i]);
+            RecentFileAction *recentAct = dynamic_cast<RecentFileAction*>(ui->menurecent_files->addAction(listOpenHistory[i]));
 
             connect(recentAct,&RecentFileAction::triggered,recentAct,&RecentFileAction::openRecent);
             void (RecentFileAction::*funcS1)(QString) = &RecentFileAction::openFile;
@@ -78,20 +87,21 @@ void MainWindow::updateRecent(){
 
 void MainWindow::setQscintilla(){
     editor=new QsciScintilla(this);
+    editor->SendScintilla(QsciScintilla::SCI_SETLEXER,QsciScintilla::SCLEX_AS);
     //设置语法
-    QsciLexerCPP *textLexer=new QsciLexerCPP;//创建一个词c法分析器
+    QsciLexerCPP *textLexer=new QsciLexerCPP;//创建一个词法分析器
     editor->setLexer(textLexer); //给QsciScintilla设置词法分析器
     textLexer->setPaper(QColor(Qt::white));//文本区域背景色
     textLexer->setColor(QColor(0,170,0),QsciLexerCPP::Comment); //设置自带的注释行为灰色
     //代码提示
-    QsciAPIs *apis=new QsciAPIs(textLexer);
+  //  QsciAPIs *apis=new QsciAPIs(textLexer);
 //    if(!apis->load(QString("D://8086//8086Software//8086Software//docapi.txt"))){
 //        QMessageBox::warning(this,QString("提示"),QString("读取文件失败"));
 //    }else{
 //        apis->prepare();
 //    }
-    apis->add("MOV");
-    apis->prepare();
+   // apis->add("MOV");
+    //apis->prepare();
     //行号提示
     editor->SendScintilla(QsciScintilla::SCI_SETCODEPAGE,QsciScintilla::SC_CP_UTF8);//设置编码为UTF-8
     QFont line_font;
@@ -162,8 +172,8 @@ void MainWindow::connectAction(){
     connect(welDialog,&WelcomeDialog::helpPage,this,&MainWindow::help);
     void (MainWindow::*func1)(QString) = &MainWindow::open;
     connect(welDialog,&WelcomeDialog::openFile,this,func1);
-    //connect(editor,&QsciScintilla::cursorPositionChanged,this,&MainWindow::cursorChange);
-    //connect(editor, &QsciScintilla::textChanged,this, &MainWindow::documentWasModified);
+    connect(editor, SIGNAL(cursorPositionChanged(int,int)),this, SLOT(slotEditorCursorChange(int,int)));
+    connect(editor, SIGNAL(textChanged()),this, SLOT(documentWasModified()));
     //Menu Connect
     //1.file
     connect(ui->actioncom_template,&QAction::triggered,this,&MainWindow::openComTemplate);
@@ -182,12 +192,13 @@ void MainWindow::connectAction(){
     connect(ui->actionpaste,&QAction::triggered,editor,&QsciScintilla::paste);
     ui->actioncut->setEnabled(false);
     ui->actioncopy->setEnabled(false);
-    connect(editor,&QsciScintilla::copyAvailable,ui->actioncut,&QAction::setEnabled);
-    connect(editor,&QsciScintilla::copyAvailable,ui->actioncopy,&QAction::setEnabled);
+    connect(editor, SIGNAL(copyAvailable(bool)),ui->actioncut, SLOT(setEnabled(bool)));
+    connect(editor, SIGNAL(copyAvailable(bool)),ui->actioncopy, SLOT(setEnabled(bool)));
+    connect(ui->actionselect_all,&QAction::triggered,this,&MainWindow::selectAllSlot);
+    connect(this,&MainWindow::selectAllSignal,editor,&QsciScintilla::selectAll);
+    connect(ui->actiongo_to_line,&QAction::triggered,this,&MainWindow::goToLine);
 
 
-    connect(ui->actionsave,&QAction::triggered,this,&MainWindow::save);
-    connect(ui->actionsave,&QAction::triggered,this,&MainWindow::save);
 
     //Tool Connect
     connect(ui->actionnew,&QAction::triggered,this,&MainWindow::openNewPage);
@@ -258,10 +269,9 @@ void MainWindow::help(){
     qDebug()<< "help";
 }
 
-
-void MainWindow::cursorChange(int lin, int index){
+void MainWindow::slotEditorCursorChange(int lin,int index){
     col->setText(QString("col:%1").arg(index));
-    line->setText(QString("line:%1").arg(lin));
+    line->setText(QString("line:%1").arg(lin+1));
 }
 
 void MainWindow::newFile()
@@ -351,18 +361,18 @@ void MainWindow::setCurrentFile(const QString &fileName)
 
     QString shownName;
     if (curFile.isEmpty()){
-        shownName = "untitled.txt";
+        shownName = "untitled.asm";
     }else{
         shownName = strippedName(curFile);
     }
 
-    setWindowTitle(tr("%1[*] - %2").arg(shownName).arg(tr("Application")));
+    setWindowTitle(tr("%1[*] - %2").arg(shownName).arg(tr("8086Software")));
 }
 
 bool MainWindow::maybeSave()
 {
     if (editor->isModified()) {
-        int ret = QMessageBox::warning(this, "Application",
+        int ret = QMessageBox::warning(this, "8086Software Exit",
                      "The document has been modified.\n"
                         "Do you want to save your changes?",
                      QMessageBox::Yes | QMessageBox::Default,
@@ -381,7 +391,7 @@ void MainWindow::loadFile(const QString &fileName)
 {
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly)) {
-        QMessageBox::warning(this, tr("Application"),
+        QMessageBox::warning(this, tr("Load File Error"),
                              tr("Cannot read file %1:\n%2.")
                              .arg(fileName)
                              .arg(file.errorString()));
@@ -401,7 +411,7 @@ bool MainWindow::saveFile(const QString &fileName)
 {
     QFile file(fileName);
     if (!file.open(QFile::WriteOnly)) {
-        QMessageBox::warning(this, tr("Application"),
+        QMessageBox::warning(this, tr("Save File Error"),
                              tr("Cannot write file %1:\n%2.")
                              .arg(fileName)
                              .arg(file.errorString()));
@@ -442,3 +452,17 @@ void MainWindow::clearRecent(){
     recent->endArray();
     updateRecent();
 }
+
+void MainWindow::selectAllSlot(){
+    emit selectAllSignal(true);
+}
+
+void MainWindow::goToLine(){
+    goToLineDialog = new GoToLineDialog(this);
+    connect(goToLineDialog,&GoToLineDialog::goToLineNum,this,&MainWindow::goToLineNum);
+}
+
+void MainWindow::goToLineNum(int num){
+    editor->setCursorPosition(num-1,0);
+}
+

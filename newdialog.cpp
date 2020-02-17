@@ -6,6 +6,7 @@ NewDialog::NewDialog(QWidget *parent) :
     ui(new Ui::NewDialog)
 {
     ui->setupUi(this);
+    this->setWindowFlags(windowFlags()&~Qt::WindowContextHelpButtonHint);
     buttonGroup = new QButtonGroup(this);
     buttonGroup->addButton(ui->com);
     buttonGroup->addButton(ui->exe);

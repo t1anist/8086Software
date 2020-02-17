@@ -1,9 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "welcomedialog.h"
-#include "newdialog.h"
-#include "recentfileaction.h"
+
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QString>
@@ -17,6 +15,10 @@
 #include "Qsci/qscilexercpp.h"
 #include "Qsci/qsciapis.h"
 
+#include "welcomedialog.h"
+#include "newdialog.h"
+#include "recentfileaction.h"
+#include "gotolinedialog.h"
 
 
 
@@ -38,6 +40,7 @@ private:
     Ui::MainWindow *ui;
     WelcomeDialog *welDialog;
     NewDialog *newPage;
+    GoToLineDialog *goToLineDialog;
     QsciScintilla *editor;
     QString curFile;
     QLabel *col;
@@ -73,9 +76,19 @@ private slots:
     void openComTemplate();
     void openExeTemplate();
     void openExamples();
-    void cursorChange(int lin, int index);
+    void slotEditorCursorChange(int lin,int index);
     void help();
     void clearRecent();
+    void selectAllSlot();
+    void goToLine();
+    void goToLineNum(int);
+
+signals:
+    void selectAllSignal(bool);
+
+
+protected:
+    void closeEvent(QCloseEvent *event) override;
 
 
 };

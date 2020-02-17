@@ -101,9 +101,6 @@
     <addaction name="separator"/>
     <addaction name="actiongo_to_line"/>
     <addaction name="separator"/>
-    <addaction name="actionindent"/>
-    <addaction name="actionoutdent"/>
-    <addaction name="separator"/>
     <addaction name="actioncomment_block"/>
     <addaction name="actionuncomment_block"/>
     <addaction name="separator"/>
@@ -307,16 +304,6 @@
     <string>go to line...</string>
    </property>
   </action>
-  <action name="actionindent">
-   <property name="text">
-    <string>indent</string>
-   </property>
-  </action>
-  <action name="actionoutdent">
-   <property name="text">
-    <string>outdent</string>
-   </property>
-  </action>
   <action name="actioncomment_block">
    <property name="text">
     <string>comment block</string>
@@ -330,7 +317,7 @@
     <string>uncomment block</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+;</string>
+    <string>Ctrl+Shift+;</string>
    </property>
   </action>
   <action name="actionshow_line_number">
